@@ -1,0 +1,998 @@
+/* =========================================================
+   ROOT VARIABLES & BASE RESET
+========================================================= */
+:root {
+  --bg-cream: #f5efe6;
+  --bg-card: #ffffff;
+  --olive-dark: #4f5d4b;
+  --olive-deep: #3d493a;
+  --olive-tint: #e4e8e0;
+  --text-muted: #6e6a63;
+  --border-soft: #dfd7cb;
+  --gold-accent: #b89552;
+--bg-cream: #f4ece0;
+  --font-script: 'Alex Brush', cursive;
+  --font-sans: 'Montserrat', sans-serif;
+  --font-serif: 'Cormorant Garamond', serif;
+  --font-arabic-quran: 'Amiri', serif;
+  --font-arabic-ui: 'Cairo', sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-cream);
+  color: var(--olive-dark);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+body.doors-locked {
+  overflow: hidden;
+  height: 100vh;
+}
+
+.blend-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* =========================================================
+   1. REALISTIC 3D HINGED DOUBLE DOORS (SWINGING INWARD)
+========================================================= */
+/* =========================================================
+   1. TRUE 3D HINGED DOUBLE DOORS (SWINGING INWARD)
+========================================================= */
+/* =========================================================
+   1. TRUE 3D HINGED DOUBLE DOORS (EXACT WORKING 3D)
+========================================================= */
+/* =========================================================
+   1. FULL-SCENE 3D SPLIT DOORS (ZERO BACKGROUND LAYER)
+========================================================= */
+.door-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  cursor: pointer;
+  user-select: none;
+  overflow: hidden;
+}
+
+.door-camera {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: scale(1);
+  opacity: 1;
+  transition: transform 1.15s cubic-bezier(0.25, 0.8, 0.25, 1),
+              opacity 0.9s ease;
+  will-change: transform, opacity;
+}
+
+.door-overlay.enter-site .door-camera {
+  transform: scale(1.42);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.door-overlay.is-hidden {
+  display: none;
+}
+
+.door-scene {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  height: 100%;
+}
+
+/* Full viewport 3D stage - NO layer behind it! */
+.doors-stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  perspective: 1400px;
+  transform-style: preserve-3d;
+}
+
+.door-leaf {
+  position: relative;
+  width: 50%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 1.95s cubic-bezier(0.32, 0.04, 0.16, 1);
+  will-change: transform;
+}
+
+.door-left {
+  transform-origin: left center;
+}
+
+.door-right {
+  transform-origin: right center;
+}
+
+.door-overlay.doors-open .door-left {
+  transform: rotateY(-108deg);
+}
+
+.door-overlay.doors-open .door-right {
+  transform: rotateY(108deg);
+}
+
+.leaf-clip {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
+}
+
+/* Exact 50% / 50% split of door.jpeg */
+.door-leaf-img {
+  position: absolute;
+  top: 0;
+  width: 200%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+}
+
+.left-img {
+  left: 0;
+}
+
+.right-img {
+  left: -100%;
+}
+
+.door-edge-shadow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.35);
+}
+.leaf-clip {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+/* Tap Hint Pill */
+/* Tap / Knock Hint Pill */
+.tap-hint {
+  position: absolute;
+  bottom: 44px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background: rgba(34, 24, 15, 0.78);
+  backdrop-filter: blur(6px);
+  color: #f5efe6;
+  padding: 11px 24px;
+  border-radius: 999px;
+  border: 1px solid rgba(245, 239, 230, 0.4);
+  font-family: var(--font-arabic-ui);
+  font-size: 0.92rem;
+  font-weight: 600;
+  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  animation: pulseHint 2.2s infinite ease-in-out;
+  transition: opacity 0.35s ease, transform 0.2s ease;
+}
+
+.knock-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.k-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(245, 239, 230, 0.3);
+  transition: background-color 0.25s ease, transform 0.25s ease;
+}
+
+.k-dot.active {
+  background-color: #e6c27a;
+  transform: scale(1.3);
+  box-shadow: 0 0 8px rgba(230, 194, 122, 0.8);
+}
+
+/* Realistic Door Knock Impact Shake */
+.door-scene.door-knock-shake {
+  animation: knockImpact 0.26s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+@keyframes knockImpact {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(0.982); }
+  65%  { transform: scale(1.008); }
+  100% { transform: scale(1); }
+}
+
+.door-overlay.doors-open .tap-hint {
+  opacity: 0;
+}
+
+.door-overlay.doors-open .tap-hint {
+  opacity: 0;
+}
+
+@keyframes pulseHint {
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  50% { transform: translateX(-50%) scale(1.05); }
+}
+
+/* =========================================================
+   2. MAIN INVITATION CONTAINER & SHARED TYPOGRAPHY
+========================================================= */
+.invitation-wrapper {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  background-color: var(--bg-cream);
+  min-height: 100vh;
+  position: relative;
+  box-shadow: 0 0 40px rgba(79, 93, 75, 0.08);
+}
+
+.script-heading {
+  font-family: var(--font-script);
+  font-size: 3.1rem;
+  font-weight: 400;
+  color: var(--olive-dark);
+  line-height: 1.15;
+  text-align: center;
+}
+
+.section-subtitle {
+  font-size: 0.7rem;
+  letter-spacing: 3.2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 6px;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.85s ease, transform 0.85s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* =========================================================
+   SECTION 1: HERO SECTION (TEXT INTEGRATED INSIDE CURTAINS & PALMS)
+========================================================= */
+/* =========================================================
+   SECTION 1: HERO SECTION (3 SEAMLESS BLOCKS: CURTAINS -> TEXT -> PALMS)
+========================================================= */
+.hero-section {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background-color: var(--bg-cream);
+  padding: 0;
+  margin: 0;
+}
+
+.hero-top-decor,
+.hero-bottom-decor {
+  width: 100%;
+  line-height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.hero-content {
+  position: static;
+  width: 100%;
+  background-color: var(--bg-cream);
+  padding: 18px 20px 24px;
+  margin: 0;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.eyebrow-text {
+  font-size: 0.72rem;
+  letter-spacing: 3.6px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.couple-names {
+  font-family: var(--font-script);
+  font-size: 3.65rem;
+  font-weight: 400;
+  color: var(--olive-dark);
+  line-height: 1.1;
+  margin-bottom: 14px;
+}
+
+.wedding-date {
+  font-size: 0.82rem;
+  letter-spacing: 3.8px;
+  color: var(--olive-dark);
+  font-weight: 500;
+}
+/* =========================================================
+   SECTION 2: QURAN VERSE & COUNTDOWN
+========================================================= */
+.countdown-section {
+  padding: 36px 24px 10px;
+  text-align: center;
+}
+
+.quran-box {
+  max-width: 340px;
+  margin: 0 auto 44px;
+}
+
+.divider-line {
+  height: 1px;
+  background-color: var(--border-soft);
+  width: 100%;
+  margin: 18px 0;
+}
+
+.quran-verse {
+  font-family: var(--font-arabic-quran);
+  font-size: 1.32rem;
+  color: #3f3b36;
+  line-height: 1.9;
+}
+
+.quran-surah {
+  font-family: var(--font-arabic-ui);
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+.countdown-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  max-width: 340px;
+  margin: 26px auto 24px;
+}
+
+.time-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.time-number {
+  font-size: 1.85rem;
+  font-weight: 400;
+  color: var(--olive-dark);
+  line-height: 1.2;
+}
+
+.time-label {
+  font-size: 0.62rem;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.string-lights-decor {
+  margin: 10px -24px 0;
+  line-height: 0;
+}
+
+/* =========================================================
+   SECTION 3: WELCOME SECTION
+========================================================= */
+.welcome-section {
+  padding: 34px 32px 24px;
+  text-align: center;
+}
+
+.welcome-copy {
+  max-width: 330px;
+  margin: 22px auto 24px;
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  line-height: 1.85;
+}
+
+.gramophone-art {
+  max-width: 185px;
+  margin: 0 auto;
+}
+
+/* =========================================================
+   SECTION 4: ORDER OF THE DAY
+========================================================= */
+.schedule-section {
+  padding: 36px 24px 42px;
+  text-align: center;
+}
+
+.timeline-list {
+  margin-top: 38px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timeline-item {
+  padding: 6px 12px;
+}
+
+.timeline-title {
+  font-size: 1.35rem;
+  font-weight: 400;
+  color: var(--olive-dark);
+  margin-bottom: 6px;
+}
+
+.timeline-time {
+  font-size: 1.02rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.timeline-desc {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.timeline-connector {
+  width: 1px;
+  height: 36px;
+  background-color: var(--border-soft);
+  margin: 18px 0;
+}
+
+/* =========================================================
+   SECTION 5: THE DETAILS & LOCATION
+========================================================= */
+.details-section {
+  padding: 36px 24px 44px;
+  text-align: center;
+}
+
+.embossed-frame-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 345px;
+  margin: 26px auto 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.embossed-frame-img {
+  width: 100%;
+  height: auto;
+}
+
+.embossed-frame-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  padding: 24px 42px;
+}
+
+.script-subheading {
+  font-family: var(--font-script);
+  font-size: 2.55rem;
+  font-weight: 400;
+  color: var(--olive-dark);
+  margin-bottom: 10px;
+}
+
+.venue-name {
+  font-size: 0.92rem;
+  letter-spacing: 2.2px;
+  font-weight: 500;
+  color: var(--olive-dark);
+  margin-bottom: 10px;
+}
+
+.venue-date {
+  font-size: 0.5rem;
+  letter-spacing: 1.6px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.venue-time {
+  font-size: 0.86rem;
+  color: var(--olive-dark);
+}
+
+.maps-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--olive-dark);
+  color: #ffffff;
+  text-decoration: none;
+  padding: 12px 28px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  margin-bottom: 24px;
+  transition: background-color 0.25s ease, transform 0.2s ease;
+}
+
+.maps-btn:hover {
+  background-color: var(--olive-deep);
+  transform: translateY(-2px);
+}
+
+.map-embed-card {
+  width: 100%;
+  max-width: 330px;
+  height: 210px;
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #e9e4dc;
+  border: 1px solid var(--border-soft);
+}
+
+.map-embed-card iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* =========================================================
+   SECTION 6: RSVP & GUEST BOOK
+========================================================= */
+.rsvp-section {
+  padding: 10px 24px 36px;
+}
+
+.card-box {
+  background-color: var(--bg-card);
+  border-radius: 14px;
+  padding: 26px 22px;
+  box-shadow: 0 6px 24px rgba(79, 93, 75, 0.06);
+  border: 1px solid rgba(223, 215, 203, 0.65);
+  margin-bottom: 22px;
+}
+
+.field-label {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 1.6px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.text-input,
+.textarea-input {
+  width: 100%;
+  background-color: #f4f1ec;
+  border: 1px solid #d8d1c7;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 22px;
+  outline: none;
+  transition: border-color 0.25s ease, background-color 0.25s ease;
+}
+
+.text-input:focus,
+.textarea-input:focus {
+  border-color: var(--olive-dark);
+  background-color: #ffffff;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.radio-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 999px;
+  border: 1px solid #d8d1c7;
+  background-color: #ffffff;
+  font-size: 0.8rem;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.radio-pill input {
+  display: none;
+}
+
+.custom-radio {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid var(--text-muted);
+  display: inline-block;
+  position: relative;
+}
+
+.radio-pill.active {
+  background-color: var(--olive-tint);
+  border-color: #c2cabd;
+  color: var(--olive-dark);
+  font-weight: 500;
+}
+
+.radio-pill.active .custom-radio {
+  border-color: var(--olive-dark);
+}
+
+.radio-pill.active .custom-radio::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background-color: var(--olive-dark);
+}
+
+.submit-btn {
+  width: 100%;
+  background-color: var(--olive-dark);
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  padding: 14px;
+  font-family: var(--font-sans);
+  font-size: 0.84rem;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background-color 0.25s ease, transform 0.2s ease;
+}
+
+.submit-btn:hover {
+  background-color: var(--olive-deep);
+  transform: translateY(-1px);
+}
+
+.form-feedback {
+  text-align: center;
+  font-size: 0.82rem;
+  margin-top: 12px;
+  color: var(--olive-dark);
+  min-height: 1.2em;
+}
+
+/* Guest Book */
+.guestbook-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.guestbook-header .line {
+  flex: 1;
+  max-width: 45px;
+  height: 1px;
+  background-color: var(--border-soft);
+}
+
+.guestbook-header h3 {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+  color: var(--olive-dark);
+}
+
+.guestbook-empty {
+  text-align: center;
+  font-family: var(--font-arabic-ui);
+  font-size: 0.9rem;
+  color: #a39e95;
+  padding: 8px 0;
+}
+
+.guestbook-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.guestbook-item {
+  background-color: #faf7f2;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.guestbook-item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.guestbook-item-name {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--olive-dark);
+}
+
+.guestbook-badge {
+  font-size: 0.65rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background-color: var(--olive-tint);
+  color: var(--olive-dark);
+  letter-spacing: 1px;
+}
+
+.guestbook-item-msg {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* =========================================================
+   SECTION 7: FOOTER
+========================================================= */
+.site-footer {
+  padding: 18px 24px 86px;
+  text-align: center;
+}
+
+.footer-window-art {
+  max-width: 195px;
+  margin: 0 auto 12px;
+}
+
+.footer-names {
+  font-family: var(--font-script);
+  font-size: 2.2rem;
+  color: var(--olive-dark);
+  margin-bottom: 18px;
+}
+
+.social-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.social-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.social-circle:hover {
+  transform: scale(1.08);
+}
+
+.social-circle.wa {
+  background-color: #25d366;
+}
+
+.social-circle.link {
+  background-color: var(--olive-dark);
+}
+
+.credit-text {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  letter-spacing: 0.4px;
+}
+
+.credit-text strong {
+  color: var(--olive-dark);
+  font-weight: 600;
+}
+
+/* =========================================================
+   FLOATING AUDIO BUTTON
+========================================================= */
+.floating-audio-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 900;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  color: var(--gold-accent);
+  border: 1.5px solid #e2d6c1;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.floating-audio-btn:hover {
+  transform: scale(1.06);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.eq-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2.5px;
+  height: 15px;
+}
+
+.eq-bars span {
+  width: 2.5px;
+  background-color: var(--gold-accent);
+  border-radius: 2px;
+  animation: eqBounce 0.9s infinite ease-in-out;
+}
+
+.eq-bars span:nth-child(1) { height: 7px; animation-delay: 0s; }
+.eq-bars span:nth-child(2) { height: 14px; animation-delay: 0.2s; }
+.eq-bars span:nth-child(3) { height: 10px; animation-delay: 0.4s; }
+.eq-bars span:nth-child(4) { height: 13px; animation-delay: 0.15s; }
+
+@keyframes eqBounce {
+  0%, 100% { transform: scaleY(0.45); }
+  50% { transform: scaleY(1); }
+}
+
+/* =========================================================
+   RESPONSIVE ADJUSTMENTS
+========================================================= */
+@media (min-width: 768px) {
+  body {
+    background-color: #ebe3d6;
+  }
+
+  .invitation-wrapper {
+    margin: 24px auto;
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+  .floating-audio-btn {
+    right: calc(50% - 220px);
+  }
+}
+/* =========================================================
+   COUPLE FLORAL PORTRAIT FRAME
+========================================================= */
+.couple-portrait-section {
+  padding: 28px 24px 36px;
+  text-align: center;
+}
+
+.floral-frame-container {
+  position: relative;
+  width: 100%;
+  max-width: 295px;
+  margin: 0 auto;
+  padding-top: 26px;
+  padding-bottom: 14px;
+}
+
+.floral-ornament {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.floral-top {
+  top: -6px;
+}
+
+.floral-bottom {
+  bottom: -4px;
+}
+
+.portrait-arch-outer {
+  position: relative;
+  padding: 9px;
+  border-radius: 160px 160px 18px 18px;
+  background: linear-gradient(145deg, #d7bc82 0%, #f4ece0 50%, #b89552 100%);
+  box-shadow:
+    0 14px 32px rgba(79, 93, 75, 0.16),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+}
+
+.portrait-arch-inner {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 152px 152px 12px 12px;
+  overflow: hidden;
+  border: 3px solid #f4ece0;
+  background-color: #ebe3d6;
+}
+
+.couple-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  transition: transform 0.7s ease;
+}
+
+.floral-frame-container:hover .couple-photo {
+  transform: scale(1.03);
+}
+
+.portrait-caption {
+  font-family: var(--font-script);
+  font-size: 1.95rem;
+  color: var(--olive-dark);
+  margin-top: 16px;
+}
